@@ -2,24 +2,23 @@
 // http://localhost:3000/isolated/exercise/02.js
 
 import React from 'react'
-import reactDomTestUtilsProductionMin from 'react-dom/cjs/react-dom-test-utils.production.min'
+
+function useLocalStorage(key, defaultValue = '') {
+  const [state, setState] = React.useState(
+    // refactor for computationally expensive calls
+    () => window.localStorage.getItem(key) || defaultValue,
+  )
+
+  React.useEffect(() => {
+    window.localStorage.setItem(key, state)
+    // useLocalStorageState()
+  }, [key, state])
+
+  return [state, setState]
+}
 
 function Greeting({initialName = ''}) {
-  // 🐨 initialize the state to the value from localStorage
-  // 💰 window.localStorage.getItem('name') || initialName
-  const [name, setName] = React.useState(
-    // refactor for computationally expensive calls
-    () => window.localStorage.getItem('name') || initialName,
-  )
-  //
-  // 🐨 Here's where you'll use `React.useEffect`.
-  // The callback should set the `name` in localStorage.
-  // 💰 window.localStorage.setItem('name', name)
-  React.useEffect(() => {
-    window.localStorage.setItem('name', name)
-    // useLocalStorageState()
-  }, [name])
-
+  const [name, setName] = useLocalStorage('name', initialName)
   function handleChange(event) {
     setName(event.target.value)
   }
@@ -33,8 +32,6 @@ function Greeting({initialName = ''}) {
     </div>
   )
 }
-
-function useLocalStorageState() {}
 
 function App() {
   return <Greeting initialName="bob" />
